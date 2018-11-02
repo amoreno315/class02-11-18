@@ -1,25 +1,57 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import phoneService from './lib/phoneService';
 class App extends Component {
+
+  state = {
+    phones: [],
+    isLoading: true,
+  }
+
+  componentDidMount() {
+    this.update()
+  }
+
+  update = () => {
+    this.setState({
+      isLoading: true,
+    });
+    phoneService.getPhones()
+    .then((result) => {
+      this.setState({
+        phones: result,
+        isLoading: false,
+      })
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+  } 
+
+  handleClick = () => {
+    phoneService.addPhone({
+      brand: 'Xiaomi',
+      model: 'Mi A2',
+      spec: ['bueno', 'balato', 'bonito'],
+      image: 'fsad',
+    })
+    .then((result) => {
+      this.update();
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+
   render() {
+    const { phones, isLoading } = this.state
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <button onClick={this.handleClick}>add Phone ching chao</button>
+        { isLoading ? <h1>Loading....</h1> : phones.map((phone) => {
+          return <div key={phone._id}>
+            {phone.brand}
+          </div>
+        })}
       </div>
     );
   }
